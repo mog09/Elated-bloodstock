@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elated Bloodstock — Global Intelligence Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#050505;--s0:#080808;--s1:#0d0d0d;--s2:#111111;--s3:#161616;
+  --b0:rgba(255,255,255,0.05);--b1:rgba(255,255,255,0.08);--b2:rgba(255,255,255,0.13);
+  --t0:#F0EEE8;--t1:#8A8F96;--t2:#454A52;--t3:#242830;
+  --acc:#BFC5CD;--pos:#3d9e6e;--neg:#9e4545;--warn:#c49a3c;
+  --ui:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--ui);background:var(--bg);color:var(--t0);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+::-webkit-scrollbar{width:2px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--b2)}
+.up{color:var(--pos)}.dn{color:var(--neg)}.nt{color:var(--t2)}.warn{color:var(--warn)}
+
+/* ══ TOP CHROME — fixed stack ══
+   nav      64px  top:0
+   ticker   30px  top:64px
+   sysbar   34px  top:94px
+   total   128px
+═══════════════════════════════ */
+.nav,.ticker,.sysbar{
+  position:fixed;left:0;right:0;z-index:200;
+  background:rgba(5,5,5,0.97);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+}
+.nav{
+  top:0;height:64px;display:flex;align-items:center;
+  justify-content:space-between;padding:0 56px;
+  border-bottom:1px solid var(--b0);
+}
+.nav-id{display:flex;flex-direction:column;gap:3px}
+.nav-name{font-size:11px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--t0)}
+.nav-class{font-size:8px;letter-spacing:.32em;text-transform:uppercase;color:var(--t2)}
+.nav-links{display:flex;gap:40px}
+.nav-lnk{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--t2);cursor:pointer;transition:color .2s;text-decoration:none}
+.nav-lnk:hover{color:var(--t0)}
+.nav-r{display:flex;align-items:center;gap:24px}
+.nav-live{font-family:var(--mono);font-size:9px;color:var(--t2);display:flex;align-items:center;gap:8px;letter-spacing:.08em}
+.live-dot{width:4px;height:4px;border-radius:50%;background:var(--pos);flex-shrink:0;animation:pulse 3s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}60%{opacity:.2}}
+.nav-btn{font-size:9px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--bg);background:var(--t0);padding:10px 22px;cursor:pointer;border:none;transition:background .2s;font-family:var(--ui)}
+.nav-btn:hover{background:var(--acc)}
+
+.ticker{top:64px;height:30px;display:flex;overflow:hidden;border-bottom:1px solid var(--b0)}
+.tk-label{display:flex;align-items:center;padding:0 16px;font-family:var(--mono);font-size:8px;letter-spacing:.26em;text-transform:uppercase;color:var(--t2);border-right:1px solid var(--b0);flex-shrink:0;height:100%}
+.tk-scroll{flex:1;overflow:hidden;display:flex;align-items:center;height:100%}
+.tk-track{display:flex;align-items:center;animation:scrollx 65s linear infinite;white-space:nowrap;height:100%}
+@keyframes scrollx{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.tk-i{display:inline-flex;align-items:center;gap:10px;padding:0 22px;border-right:1px solid var(--b0);height:100%}
+.tk-n{font-family:var(--mono);font-size:9px;color:var(--t1);letter-spacing:.08em}
+.tk-v{font-family:var(--mono);font-size:9px;color:var(--t0)}
+.tk-d{font-family:var(--mono);font-size:9px}
+
+.sysbar{top:94px;height:34px;display:flex;border-bottom:1px solid var(--b0)}
+.sys-item{flex:1;height:100%;padding:0 20px;border-right:1px solid var(--b0);display:flex;justify-content:space-between;align-items:center}
+.sys-item:last-child{border-right:none}
+.sys-lbl{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--t2)}
+.sys-val{font-family:var(--mono);font-size:9px;color:var(--t0)}
+
+/* ══ HERO ══ */
+.hero{
+  min-height:100vh;display:grid;grid-template-columns:42% 58%;
+  align-items:center;
+  padding:calc(128px + 48px) 56px 80px;
+  border-bottom:1px solid var(--b0);overflow:hidden;gap:0;
+}
+.hero-l{position:relative;z-index:2;padding-right:40px}
+.hero-eyebrow{font-size:9px;letter-spacing:.36em;text-transform:uppercase;color:var(--t2);margin-bottom:36px;display:flex;align-items:center;gap:14px}
+.hero-eyebrow::before{content:'';display:block;width:28px;height:1px;background:var(--t3)}
+.hero-h1{font-size:clamp(44px,5vw,72px);font-weight:200;line-height:1.04;letter-spacing:-.03em;color:var(--t0)}
+.hero-h1 strong{font-weight:400}
+.hero-sub{font-size:13px;font-weight:300;color:var(--t1);line-height:1.85;max-width:380px;margin-top:24px;margin-bottom:44px;letter-spacing:.01em}
+.hero-actions{display:flex;gap:14px;flex-wrap:wrap}
+.btn-p{font-size:9px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;background:var(--t0);color:var(--bg);padding:14px 30px;cursor:pointer;border:none;transition:background .2s;font-family:var(--ui)}
+.btn-p:hover{background:var(--acc)}
+.btn-g{font-size:9px;font-weight:400;letter-spacing:.22em;text-transform:uppercase;color:var(--t1);border:1px solid var(--b1);padding:14px 30px;cursor:pointer;background:none;transition:all .2s;font-family:var(--ui)}
+.btn-g:hover{border-color:var(--b2);color:var(--t0)}
+.hero-chips{display:flex;flex-direction:column;gap:10px;margin-top:44px}
+.chip{display:inline-flex;align-items:center;gap:14px;border:1px solid var(--b0);padding:10px 16px;background:var(--s0);width:fit-content}
+.chip-lbl{font-family:var(--mono);font-size:8px;color:var(--t2);letter-spacing:.12em}
+.chip-val{font-family:var(--mono);font-size:9px;color:var(--t0)}
+
+/* globe */
+.hero-r{position:relative;display:flex;align-items:center;justify-content:center;height:100%;min-height:600px}
+#globe-canvas{display:block;cursor:grab;width:100%;max-width:620px;aspect-ratio:1/1}
+#globe-canvas:active{cursor:grabbing}
+.globe-tooltip{
+  position:absolute;background:rgba(6,6,6,0.96);border:1px solid var(--b1);
+  padding:14px 18px;pointer-events:none;opacity:0;transition:opacity .2s;
+  min-width:180px;z-index:10;
+}
+.gt-name{font-size:11px;font-weight:500;color:var(--t0);margin-bottom:8px;letter-spacing:.04em}
+.gt-row{font-family:var(--mono);font-size:9px;color:var(--t1);margin-bottom:3px;display:flex;justify-content:space-between;gap:16px}
+.gt-row span:last-child{color:var(--t0)}
+.float-panel{position:absolute;border:1px solid var(--b1);background:rgba(6,6,6,0.94);padding:12px 16px;pointer-events:none;opacity:0;animation:fadeIn .6s forwards}
+.float-panel:nth-child(2){animation-delay:1.2s;top:8%;right:4%}
+.float-panel:nth-child(3){animation-delay:1.8s;bottom:14%;left:2%}
+@keyframes fadeIn{to{opacity:1}}
+.fp-lbl{font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--t2);margin-bottom:4px}
+.fp-val{font-family:var(--mono);font-size:14px;color:var(--t0)}
+.fp-d{font-family:var(--mono);font-size:9px;margin-top:2px}
+
+/* ══ SECTIONS ══ */
+.sec{padding:96px 56px;border-bottom:1px solid var(--b0)}
+.sec-hd{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:56px}
+.sec-tag{font-size:8px;letter-spacing:.32em;text-transform:uppercase;color:var(--t2);margin-bottom:10px}
+.sec-title{font-size:32px;font-weight:200;letter-spacing:-.025em;color:var(--t0)}
+.sec-n{font-family:var(--mono);font-size:10px;color:var(--t3);letter-spacing:.1em}
+
+/* ══ 01 JURISDICTION ══ */
+.region-grid{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--b0)}
+.region{padding:32px 28px;border-right:1px solid var(--b0);cursor:pointer;transition:background .25s}
+.region:last-child{border-right:none}
+.region:hover,.region.active{background:var(--s2)}
+.region-code{font-family:var(--mono);font-size:8px;letter-spacing:.28em;color:var(--t2);margin-bottom:16px}
+.region-name{font-size:18px;font-weight:300;color:var(--t0);letter-spacing:-.01em;margin-bottom:6px}
+.region-sub{font-size:10px;color:var(--t2);line-height:1.65;margin-bottom:20px}
+.region-idx{font-family:var(--mono);font-size:24px;font-weight:300;color:var(--t0);letter-spacing:-.02em}
+.region-idxd{font-family:var(--mono);font-size:10px;margin-top:3px}
+.region-bar{height:1px;background:var(--b1);margin-top:20px;overflow:hidden}
+.region-bar-fill{height:100%;background:var(--acc);width:0;transition:width 1s cubic-bezier(.16,1,.3,1)}
+.region-panel{display:none;padding-top:20px;border-top:1px solid var(--b0);margin-top:20px}
+.region.active .region-panel{display:block}
+.rp-row{font-size:10px;color:var(--t1);line-height:1.7;display:flex;gap:10px;padding:3px 0}
+.rp-row::before{content:'—';color:var(--t3);flex-shrink:0}
+
+/* ══ 02 ASSET CARDS ══ */
+.cards-grid{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--b0);background:var(--b0);gap:1px}
+.acard{background:var(--s0);cursor:pointer;transition:background .2s,transform .35s cubic-bezier(.16,1,.3,1);position:relative;overflow:hidden}
+.acard:hover{background:var(--s2);transform:translateY(-4px)}
+.acard-shine{position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.02),transparent);transition:left .6s ease;pointer-events:none}
+.acard:hover .acard-shine{left:160%}
+.acard-top{padding:28px 28px 20px;border-bottom:1px solid var(--b0)}
+.acard-id{font-family:var(--mono);font-size:8px;letter-spacing:.22em;color:var(--t2);margin-bottom:14px}
+.acard-name{font-size:20px;font-weight:300;letter-spacing:-.015em;color:var(--t0);margin-bottom:3px}
+.acard-sire{font-size:10px;color:var(--t2);letter-spacing:.04em;margin-bottom:18px}
+.acard-rating{font-family:var(--mono);font-size:60px;font-weight:200;letter-spacing:-.04em;line-height:1}
+.acard-rtg-lbl{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--t2);margin-top:4px}
+.acard-attrs{padding:20px 28px 24px}
+.attr-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--b0)}
+.attr-row:last-child{border-bottom:none}
+.attr-lbl{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--t2);min-width:105px}
+.attr-track{flex:1;height:1px;background:var(--b1);margin:0 14px;overflow:hidden}
+.attr-fill{height:100%;background:var(--acc);width:0;transition:width 1s cubic-bezier(.16,1,.3,1)}
+.attr-val{font-family:var(--mono);font-size:10px;color:var(--t0);min-width:24px;text-align:right}
+.acard-foot{padding:16px 28px;border-top:1px solid var(--b0);display:flex;justify-content:space-between;align-items:center;background:var(--bg)}
+.af-price{font-family:var(--mono);font-size:13px;color:var(--t0)}
+.af-badge{font-size:8px;letter-spacing:.18em;text-transform:uppercase;padding:5px 10px;border:1px solid}
+.badge-av{color:var(--pos);border-color:rgba(61,158,110,.28)}
+.badge-pt{color:var(--acc);border-color:rgba(191,197,205,.2)}
+.badge-pl{color:var(--t2);border-color:var(--b0)}
+
+/* ══ 03 STALLION MARKET ══ */
+.stallion-filters{display:flex;gap:0;margin-bottom:32px;border:1px solid var(--b0)}
+.sf-btn{font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;padding:10px 20px;color:var(--t2);background:none;border:none;border-right:1px solid var(--b0);cursor:pointer;transition:all .2s}
+.sf-btn:last-child{border-right:none}
+.sf-btn:hover,.sf-btn.active{background:var(--s2);color:var(--t0)}
+.stallion-header{display:grid;grid-template-columns:200px 80px 90px 90px 80px 80px 100px 120px 1fr;gap:0;border:1px solid var(--b0);border-bottom:none;background:var(--s0)}
+.sh-cell{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--t2);padding:12px 16px;border-right:1px solid var(--b0);font-weight:400}
+.sh-cell:last-child{border-right:none}
+.stallion-table{border:1px solid var(--b0);display:flex;flex-direction:column}
+.srow{display:grid;grid-template-columns:200px 80px 90px 90px 80px 80px 100px 120px 1fr;gap:0;border-bottom:1px solid var(--b0);cursor:pointer;transition:background .15s;align-items:center}
+.srow:last-child{border-bottom:none}
+.srow:hover{background:var(--s2)}
+.srow.featured{background:rgba(191,197,205,.03)}
+.scell{font-family:var(--mono);font-size:11px;color:var(--t1);padding:14px 16px;border-right:1px solid var(--b0)}
+.scell:last-child{border-right:none}
+.scell-name{font-family:var(--ui);font-size:12px;font-weight:400;color:var(--t0)}
+.scell-ticker{font-family:var(--mono);font-size:8px;color:var(--t2);letter-spacing:.1em;display:block;margin-top:2px}
+.signal{font-size:8px;letter-spacing:.14em;text-transform:uppercase;padding:4px 8px;border:1px solid}
+.sig-out{color:var(--pos);border-color:rgba(61,158,110,.25)}
+.sig-hold{color:var(--acc);border-color:rgba(191,197,205,.2)}
+.sig-under{color:var(--neg);border-color:rgba(158,69,69,.25)}
+.sig-watch{color:var(--warn);border-color:rgba(196,154,60,.25)}
+.sparkline-cell{padding:14px 16px;display:flex;align-items:center}
+.spark{display:flex;align-items:flex-end;gap:1.5px;height:24px}
+.spark-bar{width:5px;background:var(--b2);flex-shrink:0}
+
+/* ══ 04 MARKET INTELLIGENCE ══ */
+.trends-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.tr-body{font-size:12px;color:var(--t1);line-height:1.9;margin-bottom:32px}
+.tr-stats{border:1px solid var(--b0)}
+.tr-stat{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--b0)}
+.tr-stat:last-child{border-bottom:none}
+.tr-stat-l{font-size:10px;color:var(--t2);letter-spacing:.04em}
+.tr-stat-r{font-family:var(--mono);font-size:12px;color:var(--t0)}
+.trend-chart{border:1px solid var(--b0);padding:28px}
+.tc-label{font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--t2);margin-bottom:24px}
+.tc-bars{display:flex;align-items:flex-end;gap:3px;height:140px}
+.tc-bar-wrap{flex:1;height:100%;display:flex;align-items:flex-end;cursor:pointer}
+.tc-bar-inner{width:100%;height:0;background:var(--s2);transition-property:height,background;transition-duration:.85s,.2s;transition-timing-function:cubic-bezier(.16,1,.3,1),ease}
+.tc-bar-wrap:hover .tc-bar-inner,.tc-bar-wrap.hi .tc-bar-inner{background:rgba(191,197,205,.3)}
+.tc-xaxis{display:flex;justify-content:space-between;margin-top:10px}
+.tc-xaxis span{font-family:var(--mono);font-size:8px;color:var(--t2)}
+.tc-readout{display:flex;justify-content:space-between;align-items:baseline;margin-top:18px;padding-top:16px;border-top:1px solid var(--b0)}
+.tc-current{font-family:var(--mono);font-size:18px;color:var(--t0)}
+.tc-delta{font-family:var(--mono);font-size:10px}
+
+/* ══ 05 TRACK RECORD ══ */
+.tx-grid{display:flex;flex-direction:column;gap:1px;background:var(--b0)}
+.tx-row{background:var(--s0);display:grid;grid-template-columns:1fr 1fr 1fr 1fr 140px;gap:0;cursor:pointer;transition:background .2s}
+.tx-row:hover{background:var(--s2)}
+.tx-cell{padding:24px 28px;border-right:1px solid var(--b0)}
+.tx-cell:last-child{border-right:none;display:flex;align-items:center}
+.tx-lbl{font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--t2);margin-bottom:8px}
+.tx-val{font-size:13px;font-weight:400;color:var(--t0);letter-spacing:.01em}
+.tx-sub{font-size:10px;color:var(--t2);margin-top:3px}
+.tx-return{font-family:var(--mono);font-size:20px;font-weight:300;letter-spacing:-.02em}
+.tx-thesis{font-size:10px;color:var(--t1);line-height:1.65;padding:20px 28px;background:var(--bg);border-top:1px solid var(--b0);grid-column:1/-1}
+.tx-expand{display:none}
+.tx-row.open .tx-expand{display:block}
+
+/* ══ 06 SALE CALENDAR ══ */
+.cal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--b0)}
+.cal-month{background:var(--s0)}
+.cal-month-hd{padding:20px 24px;border-bottom:1px solid var(--b0);display:flex;justify-content:space-between;align-items:center}
+.cal-month-name{font-size:11px;font-weight:500;letter-spacing:.08em;color:var(--t0)}
+.cal-month-count{font-family:var(--mono);font-size:9px;color:var(--t2)}
+.cal-events{padding:16px 0}
+.cal-event{padding:10px 24px;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid var(--b0);cursor:pointer;transition:background .15s}
+.cal-event:last-child{border-bottom:none}
+.cal-event:hover{background:var(--s2)}
+.cal-ev-l{}
+.cal-ev-name{font-size:11px;color:var(--t0);margin-bottom:2px;letter-spacing:.01em}
+.cal-ev-loc{font-size:9px;color:var(--t2);letter-spacing:.06em}
+.cal-ev-r{text-align:right;flex-shrink:0;margin-left:12px}
+.cal-ev-date{font-family:var(--mono);font-size:9px;color:var(--t1)}
+.cal-ev-tag{font-size:8px;letter-spacing:.14em;text-transform:uppercase;margin-top:3px}
+.tag-primary{color:var(--acc)}
+.tag-active{color:var(--pos)}
+.tag-monitor{color:var(--t2)}
+
+/* ══ 07 PARTNER ══ */
+.partner-grid{display:grid;grid-template-columns:1fr 1fr;gap:100px;align-items:start}
+.pt-statement{font-size:22px;font-weight:200;line-height:1.6;letter-spacing:-.015em;color:var(--t1);margin-bottom:44px}
+.pt-statement strong{color:var(--t0);font-weight:300}
+.pt-criteria{border-top:1px solid var(--b0)}
+.pt-crit{display:flex;gap:20px;padding:20px 0;border-bottom:1px solid var(--b0)}
+.pt-crit:last-child{border-bottom:none;padding-bottom:0}
+.pt-num{font-family:var(--mono);font-size:9px;color:var(--t3);flex-shrink:0;padding-top:2px}
+.pt-title{font-size:12px;font-weight:400;color:var(--t0);margin-bottom:4px;letter-spacing:.01em}
+.pt-sub{font-size:11px;color:var(--t2);line-height:1.7}
+.pt-form{background:var(--b0);display:flex;flex-direction:column;gap:1px}
+.pf-field{background:var(--s0);padding:16px 20px}
+.pf-lbl{font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--t2);margin-bottom:7px}
+.pf-inp,.pf-sel{width:100%;background:none;border:none;outline:none;font-family:var(--ui);font-size:12px;color:var(--t0);appearance:none}
+.pf-inp::placeholder{color:var(--t3)}
+.pf-sel option{background:var(--s1);color:var(--t0)}
+.pf-submit{background:var(--t0);color:var(--bg);font-family:var(--ui);font-size:9px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;padding:18px;border:none;cursor:pointer;transition:background .2s;width:100%;margin-top:1px}
+.pf-submit:hover{background:var(--acc)}
+.pf-note{font-size:10px;color:var(--t2);line-height:1.75;margin-top:14px}
+
+/* ══ FOOTER ══ */
+footer{padding:28px 56px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--b0)}
+.ft-l{font-family:var(--mono);font-size:9px;color:var(--t2);display:flex;align-items:center;gap:8px}
+.ft-links{display:flex;gap:32px}
+.ft-lnk{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--t3);cursor:pointer;transition:color .2s;text-decoration:none}
+.ft-lnk:hover{color:var(--t1)}
+.ft-r{font-family:var(--mono);font-size:8px;color:var(--t3);letter-spacing:.06em}
+
+/* ══ ENTRY ANIMATIONS ══ */
+.fade-up{opacity:0;transform:translateY(20px);animation:fadeUp .8s cubic-bezier(.16,1,.3,1) forwards}
+@keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+.d1{animation-delay:.1s}.d2{animation-delay:.25s}.d3{animation-delay:.4s}.d4{animation-delay:.55s}.d5{animation-delay:.7s}
+
+@media(max-width:900px){
+  .nav{padding:0 24px}.nav-links{display:none}.sysbar{display:none}
+  .ticker{top:64px}
+  .hero{grid-template-columns:1fr;padding:calc(94px + 40px) 24px 60px;min-height:auto}
+  .hero-r{min-height:360px}
+  .hero-h1{font-size:40px}
+  .sec{padding:64px 24px}
+  .region-grid{grid-template-columns:1fr 1fr}
+  .cards-grid{grid-template-columns:1fr}
+  .trends-grid,.partner-grid{grid-template-columns:1fr;gap:40px}
+  .stallion-header,.srow{grid-template-columns:1fr 80px 80px 90px 80px}
+  .sh-cell:nth-child(n+6),.scell:nth-child(n+6){display:none}
+  .cal-grid{grid-template-columns:1fr}
+  footer{flex-direction:column;gap:20px;text-align:center;padding:28px 24px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-id">
+    <div class="nav-name">Elated Bloodstock</div>
+    <div class="nav-class">Global Intelligence Platform</div>
+  </div>
+  <div class="nav-links">
+    <a class="nav-lnk" href="#intelligence">Intelligence</a>
+    <a class="nav-lnk" href="#portfolio">Portfolio</a>
+    <a class="nav-lnk" href="#stallions">Stallion Market</a>
+    <a class="nav-lnk" href="#markets">Markets</a>
+    <a class="nav-lnk" href="#transactions">Track Record</a>
+    <a class="nav-lnk" href="#partner">Partner</a>
+  </div>
+  <div class="nav-r">
+    <div class="nav-live"><div class="live-dot"></div>LIVE · SYD · <span id="clock">—</span></div>
+    <button class="nav-btn">Private Access</button>
+  </div>
+</nav>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="tk-label">EBX</div>
+  <div class="tk-scroll"><div class="tk-track" id="tk-track">
+    <span class="tk-i"><span class="tk-n">AU FILLY IDX</span><span class="tk-v">4,182</span><span class="tk-d up">+2.4%</span></span>
+    <span class="tk-i"><span class="tk-n">INGLIS PREMIER</span><span class="tk-v">A$2.1M</span><span class="tk-d up">+8.2%</span></span>
+    <span class="tk-i"><span class="tk-n">I AM INVINCIBLE</span><span class="tk-v">A$110K</span><span class="tk-d nt">STB</span></span>
+    <span class="tk-i"><span class="tk-n">NZB PREMIER IDX</span><span class="tk-v">3,947</span><span class="tk-d dn">−0.7%</span></span>
+    <span class="tk-i"><span class="tk-n">MAGIC MILLIONS G1</span><span class="tk-v">A$3.4M</span><span class="tk-d up">+12.1%</span></span>
+    <span class="tk-i"><span class="tk-n">TATTERSALLS BK1</span><span class="tk-v">£6,210</span><span class="tk-d up">+5.1%</span></span>
+    <span class="tk-i"><span class="tk-n">MERCHANT NAVY</span><span class="tk-v">A$88K</span><span class="tk-d up">+6.4%</span></span>
+    <span class="tk-i"><span class="tk-n">AUD / GBP</span><span class="tk-v">0.512</span><span class="tk-d dn">−0.3%</span></span>
+    <span class="tk-i"><span class="tk-n">EBX PORTFOLIO</span><span class="tk-v">A$18.4M</span><span class="tk-d up">+24.7%</span></span>
+    <span class="tk-i"><span class="tk-n">FASTNET ROCK</span><span class="tk-v">A$77K</span><span class="tk-d nt">STB</span></span>
+    <span class="tk-i"><span class="tk-n">DEEP FIELD</span><span class="tk-v">A$33K</span><span class="tk-d up">+4.1%</span></span>
+    <span class="tk-i"><span class="tk-n">KEENELAND NOV</span><span class="tk-v">$420K</span><span class="tk-d dn">−1.2%</span></span>
+    <span class="tk-i"><span class="tk-n">SO YOU THINK</span><span class="tk-v">A$44K</span><span class="tk-d nt">STB</span></span>
+    <span class="tk-i"><span class="tk-n">WINX LINEAGE</span><span class="tk-v">PREMIUM</span><span class="tk-d up">VERIFIED</span></span>
+  </div></div>
+</div>
+
+<!-- SYSBAR -->
+<div class="sysbar">
+  <div class="sys-item"><span class="sys-lbl">System</span><span class="sys-val" style="color:var(--pos)">Operational</span></div>
+  <div class="sys-item"><span class="sys-lbl">Data Feed</span><span class="sys-val" style="color:var(--pos)">Live</span></div>
+  <div class="sys-item"><span class="sys-lbl">Active Mandates</span><span class="sys-val">7</span></div>
+  <div class="sys-item"><span class="sys-lbl">Portfolio Value</span><span class="sys-val">A$18.4M</span></div>
+  <div class="sys-item"><span class="sys-lbl">Assets Placed</span><span class="sys-val">34</span></div>
+  <div class="sys-item"><span class="sys-lbl">Session</span><span class="sys-val">Authenticated</span></div>
+</div>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="hero-l">
+    <div class="hero-eyebrow fade-up d1">Global Bloodstock Intelligence</div>
+    <h1 class="hero-h1 fade-up d2">Global<br>Bloodstock<br><strong>Intelligence.</strong></h1>
+    <p class="hero-sub fade-up d3">Identifying, acquiring and trading elite female families across the world's major bloodstock jurisdictions.</p>
+    <div class="hero-actions fade-up d4">
+      <button class="btn-p">Request Access</button>
+      <button class="btn-g">View Portfolio</button>
+    </div>
+    <div class="hero-chips fade-up d5">
+      <div class="chip"><span class="chip-lbl">PORTFOLIO</span><span class="chip-val">A$18.4M</span><span class="tk-d up" style="font-family:var(--mono);font-size:9px">+24.7% YTD</span></div>
+      <div class="chip"><span class="chip-lbl">MANDATES</span><span class="chip-val">7 ACTIVE</span></div>
+      <div class="chip"><span class="chip-lbl">JURISDICTIONS</span><span class="chip-val">8 GLOBAL</span></div>
+    </div>
+  </div>
+  <div class="hero-r">
+    <div class="float-panel"><div class="fp-lbl">AU Filly Index</div><div class="fp-val">4,182</div><div class="fp-d up">+2.4% · 30d</div></div>
+    <div class="float-panel"><div class="fp-lbl">Tattersalls Bk1</div><div class="fp-val">£6,210</div><div class="fp-d up">+5.1% · 30d</div></div>
+    <canvas id="globe-canvas"></canvas>
+    <div class="globe-tooltip" id="globe-tooltip">
+      <div class="gt-name" id="gt-name">—</div>
+      <div class="gt-row"><span>Index</span><span id="gt-idx">—</span></div>
+      <div class="gt-row"><span>30d</span><span id="gt-d">—</span></div>
+      <div class="gt-row"><span>Key Sale</span><span id="gt-sale">—</span></div>
+      <div class="gt-row"><span>Status</span><span id="gt-status">—</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 01 JURISDICTION ═══ -->
+<section class="sec" id="intelligence">
+  <div class="sec-hd">
+    <div><div class="sec-tag">Jurisdiction Intelligence</div><div class="sec-title">Global market coverage</div></div>
+    <div class="sec-n">01 / 06</div>
+  </div>
+  <div class="region-grid">
+    <div class="region active" data-r="au" onclick="selRegion(this)">
+      <div class="region-code">AU · AUSTRALIA</div>
+      <div class="region-name">Australia</div>
+      <div class="region-sub">Inglis · Magic Millions<br>Sydney · Melbourne · Brisbane</div>
+      <div class="region-idx">4,182</div>
+      <div class="region-idxd up">+2.4% · 30d</div>
+      <div class="region-bar"><div class="region-bar-fill" data-w="88"></div></div>
+      <div class="region-panel">
+        <div class="rp-row">Primary market — highest filly volume by jurisdiction</div>
+        <div class="rp-row">Strong I Am Invincible &amp; Merchant Navy commercial demand</div>
+        <div class="rp-row">Magic Millions bonus scheme drives early filly premiums</div>
+        <div class="rp-row">Deep domestic pool with active export demand to Japan</div>
+      </div>
+    </div>
+    <div class="region" data-r="jp" onclick="selRegion(this)">
+      <div class="region-code">JP · JAPAN</div>
+      <div class="region-name">Japan</div>
+      <div class="region-sub">JRA Intelligence<br>Tokyo · Nakayama · Kyoto</div>
+      <div class="region-idx">¥180M</div>
+      <div class="region-idxd up">+6.8% · 30d</div>
+      <div class="region-bar"><div class="region-bar-fill" data-w="71"></div></div>
+      <div class="region-panel">
+        <div class="rp-row">Dominant global broodmare export destination</div>
+        <div class="rp-row">Premium paid for G1 black type from Southern Hemisphere</div>
+        <div class="rp-row">Yen volatility creates arbitrage windows for AU/EU buyers</div>
+        <div class="rp-row">EBX maintains active JRA approval relationships</div>
+      </div>
+    </div>
+    <div class="region" data-r="eu" onclick="selRegion(this)">
+      <div class="region-code">EU · EUROPE</div>
+      <div class="region-name">Europe</div>
+      <div class="region-sub">Tattersalls · Goffs<br>Newmarket · Deauville · Kildare</div>
+      <div class="region-idx">£6,210</div>
+      <div class="region-idxd up">+5.1% · 30d</div>
+      <div class="region-bar"><div class="region-bar-fill" data-w="79"></div></div>
+      <div class="region-panel">
+        <div class="rp-row">Tattersalls Book 1 — global benchmark for elite filly valuation</div>
+        <div class="rp-row">Frankel and Galileo lines command international premiums</div>
+        <div class="rp-row">GBP/EUR to AUD arbitrage benefits Southern Hemisphere buyers</div>
+        <div class="rp-row">Coolmore &amp; Godolphin programme access for retained agency</div>
+      </div>
+    </div>
+    <div class="region" data-r="us" onclick="selRegion(this)">
+      <div class="region-code">US · AMERICA</div>
+      <div class="region-name">America</div>
+      <div class="region-sub">Keeneland · OBS<br>Lexington · Ocala · Saratoga</div>
+      <div class="region-idx">$420K</div>
+      <div class="region-idxd dn">−1.2% · 30d</div>
+      <div class="region-bar"><div class="region-bar-fill" data-w="58"></div></div>
+      <div class="region-panel">
+        <div class="rp-row">Keeneland November — premier North American broodmare sale</div>
+        <div class="rp-row">Storm Cat and A.P. Indy crossings in sustained demand</div>
+        <div class="rp-row">USD softness creating entry points for AUD-based buyers</div>
+        <div class="rp-row">EBX intelligence coverage actively expanding Q1 2025</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 02 ASSET REGISTRY ═══ -->
+<section class="sec" id="portfolio">
+  <div class="sec-hd">
+    <div><div class="sec-tag">Asset Registry</div><div class="sec-title">Active portfolio</div></div>
+    <div class="sec-n">02 / 06</div>
+  </div>
+  <div class="cards-grid">
+    <div class="acard">
+      <div class="acard-shine"></div>
+      <div class="acard-top">
+        <div class="acard-id">EBX-AU-2024-001 · PLACED</div>
+        <div class="acard-name">Francesca's Turn</div>
+        <div class="acard-sire">I Am Invincible × Turning Top · 3yo F · AUS</div>
+        <div class="acard-rating">94</div>
+        <div class="acard-rtg-lbl">EBX Overall Rating</div>
+      </div>
+      <div class="acard-attrs">
+        <div class="attr-row"><span class="attr-lbl">Pedigree</span><div class="attr-track"><div class="attr-fill" data-w="96"></div></div><span class="attr-val">96</span></div>
+        <div class="attr-row"><span class="attr-lbl">Commercial</span><div class="attr-track"><div class="attr-fill" data-w="92"></div></div><span class="attr-val">92</span></div>
+        <div class="attr-row"><span class="attr-lbl">Compatibility</span><div class="attr-track"><div class="attr-fill" data-w="88"></div></div><span class="attr-val">88</span></div>
+        <div class="attr-row"><span class="attr-lbl">Residual Value</span><div class="attr-track"><div class="attr-fill" data-w="94"></div></div><span class="attr-val">94</span></div>
+        <div class="attr-row"><span class="attr-lbl">Momentum</span><div class="attr-track"><div class="attr-fill" data-w="90"></div></div><span class="attr-val">90</span></div>
+      </div>
+      <div class="acard-foot"><span class="af-price">A$1,850,000</span><span class="af-badge badge-pl">Placed</span></div>
+    </div>
+    <div class="acard" style="border-top:1px solid rgba(191,197,205,0.4)">
+      <div class="acard-shine"></div>
+      <div class="acard-top">
+        <div class="acard-id" style="color:var(--acc)">EBX-NZ-2024-002 · MANDATE ACTIVE</div>
+        <div class="acard-name">Midnight Meridian</div>
+        <div class="acard-sire">Merchant Navy × Sheer Brilliance · 2yo F · NZL</div>
+        <div class="acard-rating" style="color:var(--acc)">91</div>
+        <div class="acard-rtg-lbl">EBX Overall Rating</div>
+      </div>
+      <div class="acard-attrs">
+        <div class="attr-row"><span class="attr-lbl">Pedigree</span><div class="attr-track"><div class="attr-fill" data-w="90"></div></div><span class="attr-val">90</span></div>
+        <div class="attr-row"><span class="attr-lbl">Commercial</span><div class="attr-track"><div class="attr-fill" data-w="94"></div></div><span class="attr-val">94</span></div>
+        <div class="attr-row"><span class="attr-lbl">Compatibility</span><div class="attr-track"><div class="attr-fill" data-w="86"></div></div><span class="attr-val">86</span></div>
+        <div class="attr-row"><span class="attr-lbl">Residual Value</span><div class="attr-track"><div class="attr-fill" data-w="88"></div></div><span class="attr-val">88</span></div>
+        <div class="attr-row"><span class="attr-lbl">Momentum</span><div class="attr-track"><div class="attr-fill" data-w="95"></div></div><span class="attr-val">95</span></div>
+      </div>
+      <div class="acard-foot"><span class="af-price">Mandate Active</span><span class="af-badge badge-av">Available</span></div>
+    </div>
+    <div class="acard">
+      <div class="acard-shine"></div>
+      <div class="acard-top">
+        <div class="acard-id">EBX-EU-2024-003 · PRIVATE</div>
+        <div class="acard-name">Solar Sovereign</div>
+        <div class="acard-sire">So You Think × Golden Thread · 4yo F · IRE</div>
+        <div class="acard-rating">89</div>
+        <div class="acard-rtg-lbl">EBX Overall Rating</div>
+      </div>
+      <div class="acard-attrs">
+        <div class="attr-row"><span class="attr-lbl">Pedigree</span><div class="attr-track"><div class="attr-fill" data-w="92"></div></div><span class="attr-val">92</span></div>
+        <div class="attr-row"><span class="attr-lbl">Commercial</span><div class="attr-track"><div class="attr-fill" data-w="84"></div></div><span class="attr-val">84</span></div>
+        <div class="attr-row"><span class="attr-lbl">Compatibility</span><div class="attr-track"><div class="attr-fill" data-w="91"></div></div><span class="attr-val">91</span></div>
+        <div class="attr-row"><span class="attr-lbl">Residual Value</span><div class="attr-track"><div class="attr-fill" data-w="86"></div></div><span class="attr-val">86</span></div>
+        <div class="attr-row"><span class="attr-lbl">Momentum</span><div class="attr-track"><div class="attr-fill" data-w="82"></div></div><span class="attr-val">82</span></div>
+      </div>
+      <div class="acard-foot"><span class="af-price">£920,000</span><span class="af-badge badge-pt">Private</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 03 STALLION MARKET ═══ -->
+<section class="sec" id="stallions">
+  <div class="sec-hd">
+    <div><div class="sec-tag">Sire Intelligence</div><div class="sec-title">Stallion market · Live performance index</div></div>
+    <div class="sec-n">03 / 06</div>
+  </div>
+  <div style="font-size:12px;color:var(--t1);line-height:1.85;max-width:640px;margin-bottom:36px">
+    EBX tracks stallion performance in real time — winners, stakes winners and filly-specific returns across all major jurisdictions. Ratings update seasonally. Signal is based on 30-day winner momentum against prior period.
+  </div>
+  <div class="stallion-filters">
+    <button class="sf-btn active" onclick="filterSires('all',this)">All Sires</button>
+    <button class="sf-btn" onclick="filterSires('au',this)">Australia</button>
+    <button class="sf-btn" onclick="filterSires('sh',this)">Southern Hemisphere</button>
+    <button class="sf-btn" onclick="filterSires('nh',this)">Northern Hemisphere</button>
+    <button class="sf-btn" onclick="filterSires('filly',this)">Filly Specialists</button>
+  </div>
+  <div class="stallion-header">
+    <div class="sh-cell">Stallion</div>
+    <div class="sh-cell">Stud Fee</div>
+    <div class="sh-cell">Winners 30d</div>
+    <div class="sh-cell">W/R Ratio</div>
+    <div class="sh-cell">G1 Winners</div>
+    <div class="sh-cell">Filly %</div>
+    <div class="sh-cell">Signal</div>
+    <div class="sh-cell">Trend</div>
+    <div class="sh-cell">EBX Rating</div>
+  </div>
+  <div class="stallion-table" id="stallion-table"></div>
+</section>
+
+<!-- ═══ 04 MARKET INTELLIGENCE ═══ -->
+<section class="sec" id="markets">
+  <div class="sec-hd">
+    <div><div class="sec-tag">Market Intelligence</div><div class="sec-title">Global filly index · 12 month</div></div>
+    <div class="sec-n">04 / 06</div>
+  </div>
+  <div class="trends-grid">
+    <div>
+      <p class="tr-body">The elite filly market has outperformed broader bloodstock indices for three consecutive seasons. Our proprietary EBX composite tracks real-time valuation across eight jurisdictions — identifying momentum before it prices into the market.</p>
+      <div class="tr-stats">
+        <div class="tr-stat"><span class="tr-stat-l">Portfolio YTD Return</span><span class="tr-stat-r" style="color:var(--pos)">+24.7%</span></div>
+        <div class="tr-stat"><span class="tr-stat-l">Assets Placed (3yr)</span><span class="tr-stat-r">34</span></div>
+        <div class="tr-stat"><span class="tr-stat-l">Avg. Acquisition Premium</span><span class="tr-stat-r" style="color:var(--pos)">+12.4% vs reserve</span></div>
+        <div class="tr-stat"><span class="tr-stat-l">Avg. Exit Premium</span><span class="tr-stat-r" style="color:var(--pos)">+38.2% vs entry</span></div>
+        <div class="tr-stat"><span class="tr-stat-l">G1 Placed Assets</span><span class="tr-stat-r">11</span></div>
+        <div class="tr-stat"><span class="tr-stat-l">Active Jurisdictions</span><span class="tr-stat-r">8 global</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="trend-chart">
+        <div class="tc-label">EBX Composite Filly Index · AU$</div>
+        <div class="tc-bars" id="chart-bars"></div>
+        <div class="tc-xaxis"><span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span></div>
+        <div class="tc-readout">
+          <span class="tc-current" id="chart-val">A$4,182</span>
+          <span class="tc-delta up">+24.7% YTD</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 05 TRACK RECORD ═══ -->
+<section class="sec" id="transactions">
+  <div class="sec-hd">
+    <div><div class="sec-tag">Transaction Intelligence</div><div class="sec-title">Selected track record</div></div>
+    <div class="sec-n">05 / 06</div>
+  </div>
+  <div style="font-size:12px;color:var(--t1);line-height:1.85;max-width:580px;margin-bottom:44px">
+    A selection of completed mandates. All client identities and transaction parties are withheld by default. Click any transaction to expand the investment thesis.
+  </div>
+  <div class="tx-grid" id="tx-grid"></div>
+</section>
+
+<!-- ═══ 06 SALE CALENDAR ═══ -->
+<section class="sec" id="calendar">
+  <div class="sec-hd">
+    <div><div class="sec-tag">Sale Intelligence</div><div class="sec-title">Global sale calendar · 2025</div></div>
+    <div class="sec-n">Sale Calendar</div>
+  </div>
+  <div class="cal-grid" id="cal-grid"></div>
+</section>
+
+<!-- ═══ 07 PARTNER ═══ -->
+<section class="sec" id="partner">
+  <div class="sec-hd">
+    <div><div class="sec-tag">Investment Access</div><div class="sec-title">Partner with Elated</div></div>
+    <div class="sec-n">06 / 06</div>
+  </div>
+  <div class="partner-grid">
+    <div>
+      <p class="pt-statement">We work with a <strong>select number of investors, stud operations and syndicates</strong> requiring institutional-grade intelligence in the elite filly and broodmare market. Access is by mandate only.</p>
+      <div class="pt-criteria">
+        <div class="pt-crit"><span class="pt-num">01</span><div><div class="pt-title">Mandate-based access</div><div class="pt-sub">All engagements are structured around a specific acquisition or placement mandate with defined parameters and jurisdictions.</div></div></div>
+        <div class="pt-crit"><span class="pt-num">02</span><div><div class="pt-title">Global network activation</div><div class="pt-sub">Access to relationships across eight jurisdictions — Inglis, Magic Millions, Tattersalls, Goffs, NZB, Keeneland and beyond.</div></div></div>
+        <div class="pt-crit"><span class="pt-num">03</span><div><div class="pt-title">Proprietary EBX rating methodology</div><div class="pt-sub">Applied to every prospective asset — pedigree strength, commercial appeal, residual value and market momentum scoring.</div></div></div>
+        <div class="pt-crit"><span class="pt-num">04</span><div><div class="pt-title">Absolute confidentiality</div><div class="pt-sub">All mandates, transactions and client identities are treated with complete discretion as a non-negotiable standard.</div></div></div>
+      </div>
+    </div>
+    <div>
+      <div class="pt-form">
+        <div class="pf-field"><div class="pf-lbl">Full Name</div><input class="pf-inp" type="text"></div>
+        <div class="pf-field"><div class="pf-lbl">Email Address</div><input class="pf-inp" type="email"></div>
+        <div class="pf-field"><div class="pf-lbl">Organisation</div><input class="pf-inp" type="text"></div>
+        <div class="pf-field">
+          <div class="pf-lbl">Mandate Type</div>
+          <select class="pf-sel">
+            <option value="" disabled selected></option>
+            <option>Acquisition — Australian Market</option>
+            <option>Acquisition — New Zealand Market</option>
+            <option>Acquisition — European Market</option>
+            <option>Export Placement — Japan</option>
+            <option>Portfolio Intelligence Retainer</option>
+            <option>Strategic Advisory</option>
+          </select>
+        </div>
+        <div class="pf-field"><div class="pf-lbl">Mandate Value (approx. AUD)</div><input class="pf-inp" type="text"></div>
+        <button class="pf-submit">Submit Mandate Request</button>
+      </div>
+      <p class="pf-note">All enquiries are treated with absolute confidentiality. Qualified mandates receive a response within 48 hours.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-l"><div class="live-dot"></div>EBX PLATFORM · OPERATIONAL · SYDNEY</div>
+  <div class="ft-links">
+    <a class="ft-lnk" href="#">Privacy</a>
+    <a class="ft-lnk" href="#">Disclosure</a>
+    <a class="ft-lnk" href="#">Terms</a>
+    <a class="ft-lnk" href="#">Contact</a>
+  </div>
+  <div class="ft-r">© 2025 ELATED BLOODSTOCK PTY LTD · ABN 00 000 000 000</div>
+</footer>
+
+<script>
+/* ════════════════════════════════
+   CLOCK
+════════════════════════════════ */
+(function(){
+  function tick(){
+    const n=new Date(),h=String(n.getHours()).padStart(2,'0'),m=String(n.getMinutes()).padStart(2,'0'),s=String(n.getSeconds()).padStart(2,'0');
+    const el=document.getElementById('clock');if(el)el.textContent=h+':'+m+':'+s+' AEST';
+  }
+  tick();setInterval(tick,1000);
+})();
+
+/* ════════════════════════════════
+   TICKER — duplicate for loop
+════════════════════════════════ */
+(function(){
+  const t=document.getElementById('tk-track');
+  if(t)t.innerHTML+=t.innerHTML;
+})();
+
+/* ════════════════════════════════
+   GLOBE
+════════════════════════════════ */
+(function(){
+  const canvas=document.getElementById('globe-canvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const tooltip=document.getElementById('globe-tooltip');
+
+  function resize(){
+    const sz=Math.min(canvas.parentElement.offsetWidth,620);
+    canvas.width=sz;canvas.height=sz;
+  }
+  resize();
+  window.addEventListener('resize',resize);
+
+  /* ── continent outlines (simplified polygons, lat/lng pairs) ── */
+  const CONTINENTS=[
+    /* Australia */
+    {name:'Australia',pts:[[-17,123],[-14,130],[-12,136],[-15,141],[-11,142],[-16,146],[-20,149],[-24,152],[-28,154],[-34,151],[-38,147],[-39,144],[-38,141],[-36,137],[-32,134],[-32,129],[-34,123],[-30,115],[-25,114],[-22,114],[-18,122],[-17,123]]},
+    /* South America */
+    {name:'S.America',pts:[[12,-72],[10,-63],[7,-61],[3,-51],[-5,-35],[-10,-37],[-15,-39],[-23,-43],[-30,-50],[-35,-57],[-42,-63],[-52,-69],[-55,-65],[-50,-57],[-45,-52],[-38,-57],[-35,-56],[-28,-49],[-22,-43],[-15,-39],[-5,-35],[3,-51],[10,-63],[12,-72]]},
+    /* North America */
+    {name:'N.America',pts:[[72,-140],[68,-133],[60,-141],[55,-130],[50,-125],[45,-124],[38,-123],[35,-120],[30,-117],[25,-110],[22,-106],[20,-105],[18,-96],[15,-90],[12,-84],[10,-85],[8,-83],[10,-80],[18,-68],[25,-77],[30,-81],[35,-76],[40,-74],[42,-70],[45,-64],[50,-55],[55,-59],[60,-64],[65,-64],[70,-68],[72,-75],[72,-85],[75,-95],[72,-110],[70,-130],[72,-140]]},
+    /* Europe */
+    {name:'Europe',pts:[[72,26],[68,28],[65,25],[60,25],[58,22],[55,21],[53,14],[50,8],[47,8],[44,12],[42,14],[40,18],[38,16],[36,10],[38,5],[40,0],[44,-2],[48,0],[52,5],[54,8],[57,10],[60,5],[62,5],[65,14],[68,17],[70,20],[72,26]]},
+    /* Africa */
+    {name:'Africa',pts:[[38,22],[35,25],[30,32],[24,36],[18,38],[12,42],[8,42],[3,38],[0,32],[-5,28],[-10,28],[-15,30],[-20,34],[-25,33],[-30,31],[-34,26],[-34,18],[-30,17],[-25,15],[-18,12],[-12,12],[-5,9],[0,8],[5,3],[8,2],[12,5],[15,12],[18,14],[22,18],[26,22],[30,25],[35,22],[38,22]]},
+    /* Asia */
+    {name:'Asia',pts:[[72,55],[68,60],[65,65],[60,68],[55,72],[50,80],[45,80],[42,78],[38,68],[35,60],[30,55],[25,57],[22,68],[18,72],[12,78],[8,80],[5,95],[3,100],[0,105],[5,115],[10,120],[15,120],[20,110],[25,90],[30,78],[35,70],[40,62],[45,55],[50,50],[55,55],[60,60],[65,65],[68,60],[72,55]]},
+  ];
+
+  /* ── nodes with tooltip data ── */
+  const NODES=[
+    {lat:-33.87,lng:151.21,lbl:'SYD',bright:true,name:'Sydney, Australia',idx:'4,182',d:'+2.4%',sale:'Inglis Premier',status:'Primary Market'},
+    {lat:-37.81,lng:144.96,lbl:'MEL',bright:true,name:'Melbourne, Australia',idx:'4,182',d:'+2.4%',sale:'Magic Millions',status:'Primary Market'},
+    {lat:51.51,lng:-0.13,lbl:'LON',bright:false,name:'London, UK',idx:'£6,210',d:'+5.1%',sale:'Tattersalls Bk1',status:'Active'},
+    {lat:53.33,lng:-6.25,lbl:'DUB',bright:false,name:'Dublin, Ireland',idx:'€5,840',d:'+3.8%',sale:'Goffs Orby',status:'Active'},
+    {lat:35.68,lng:139.69,lbl:'TYO',bright:false,name:'Tokyo, Japan',idx:'¥180M',d:'+6.8%',sale:'JRA Selection',status:'Export Key'},
+    {lat:38.03,lng:-84.50,lbl:'LEX',bright:false,name:'Lexington, USA',idx:'$420K',d:'−1.2%',sale:'Keeneland Nov',status:'Expanding'},
+    {lat:-36.87,lng:174.76,lbl:'AKL',bright:false,name:'Auckland, NZ',idx:'NZ$3,947',d:'−0.7%',sale:'NZB Premier',status:'Active'},
+    {lat:48.86,lng:2.35,lbl:'PAR',bright:false,name:'Paris, France',idx:'€5,210',d:'+2.1%',sale:'Arqana Aug',status:'Monitoring'},
+  ];
+
+  const ARCS=[[0,2],[0,4],[0,6],[1,2],[2,3],[2,4],[0,5],[3,7],[4,2],[6,4]];
+
+  let rotY=2.0,spinRate=0.00025,lastTime=null;
+  let isDrag=false,dragX=0,dragRot=0;
+  let hoveredNode=null;
+
+  canvas.addEventListener('mousedown',e=>{isDrag=true;dragX=e.clientX;dragRot=rotY;canvas.style.cursor='grabbing'});
+  window.addEventListener('mousemove',e=>{
+    if(isDrag){rotY=dragRot+(e.clientX-dragX)*0.004;return;}
+    /* hover detection */
+    const rect=canvas.getBoundingClientRect();
+    const mx=e.clientX-rect.left,my=e.clientY-rect.top;
+    const W=canvas.width,H=canvas.height,R=Math.min(W,H)*0.44;
+    let found=null;
+    NODES.forEach(n=>{
+      const p=project(n.lat,n.lng,R,W,H);
+      if(!p.vis)return;
+      const dx=mx-p.sx,dy=my-p.sy;
+      if(Math.sqrt(dx*dx+dy*dy)<14)found=n;
+    });
+    hoveredNode=found;
+    if(found){
+      document.getElementById('gt-name').textContent=found.name;
+      document.getElementById('gt-idx').textContent=found.idx;
+      document.getElementById('gt-d').textContent=found.d;
+      document.getElementById('gt-sale').textContent=found.sale;
+      document.getElementById('gt-status').textContent=found.status;
+      const tx=Math.min(e.clientX-rect.left+20,W-200);
+      const ty=Math.max(e.clientY-rect.top-60,10);
+      tooltip.style.left=tx+'px';tooltip.style.top=ty+'px';tooltip.style.opacity='1';
+      canvas.style.cursor='pointer';
+    } else {
+      tooltip.style.opacity='0';canvas.style.cursor='grab';
+    }
+  });
+  window.addEventListener('mouseup',()=>{isDrag=false;canvas.style.cursor='grab'});
+  canvas.addEventListener('touchstart',e=>{isDrag=true;dragX=e.touches[0].clientX;dragRot=rotY},{passive:true});
+  window.addEventListener('touchmove',e=>{if(isDrag)rotY=dragRot+(e.touches[0].clientX-dragX)*0.004},{passive:true});
+  window.addEventListener('touchend',()=>{isDrag=false});
+
+  function project(lat,lng,R,W,H){
+    const phi=(90-lat)*Math.PI/180,th=lng*Math.PI/180+rotY;
+    const x=R*Math.sin(phi)*Math.cos(th),y=-R*Math.cos(phi),z=R*Math.sin(phi)*Math.sin(th);
+    return{sx:W/2+x,sy:H/2+y,z,vis:z>-R*0.05};
+  }
+
+  function drawContinent(pts,R,W,H,ctx){
+    ctx.beginPath();let pen=false;
+    pts.forEach(([lat,lng])=>{
+      const p=project(lat,lng,R,W,H);
+      if(p.vis){pen?ctx.lineTo(p.sx,p.sy):ctx.moveTo(p.sx,p.sy);pen=true;}
+      else pen=false;
+    });
+    ctx.strokeStyle='rgba(191,197,205,0.18)';ctx.lineWidth=0.8;ctx.stroke();
+    ctx.fillStyle='rgba(191,197,205,0.04)';ctx.fill();
+  }
+
+  function frame(ts){
+    if(!lastTime)lastTime=ts;
+    const dt=ts-lastTime;lastTime=ts;
+    if(!isDrag)rotY+=spinRate*dt;
+    const W=canvas.width,H=canvas.height,R=Math.min(W,H)*0.44,CX=W/2,CY=H/2;
+    ctx.clearRect(0,0,W,H);
+
+    /* atmosphere */
+    const atmo=ctx.createRadialGradient(CX,CY,R*0.9,CX,CY,R*1.2);
+    atmo.addColorStop(0,'rgba(191,197,205,0.08)');atmo.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.beginPath();ctx.arc(CX,CY,R*1.2,0,Math.PI*2);ctx.fillStyle=atmo;ctx.fill();
+
+    /* sphere */
+    const sg=ctx.createRadialGradient(CX-R*.28,CY-R*.28,R*.04,CX,CY,R);
+    sg.addColorStop(0,'rgba(42,47,58,0.97)');
+    sg.addColorStop(0.4,'rgba(20,22,28,0.98)');
+    sg.addColorStop(0.75,'rgba(10,11,14,0.99)');
+    sg.addColorStop(1,'rgba(4,4,6,1)');
+    ctx.beginPath();ctx.arc(CX,CY,R,0,Math.PI*2);ctx.fillStyle=sg;ctx.fill();
+
+    /* rim */
+    ctx.beginPath();ctx.arc(CX,CY,R,0,Math.PI*2);
+    ctx.strokeStyle='rgba(191,197,205,0.2)';ctx.lineWidth=1;ctx.stroke();
+
+    /* clip */
+    ctx.save();ctx.beginPath();ctx.arc(CX,CY,R-.5,0,Math.PI*2);ctx.clip();
+
+    /* lat lines */
+    for(let lat=-60;lat<=60;lat+=30){
+      const phi=(90-lat)*Math.PI/180,ry=R*Math.cos(phi),rx=R*Math.sin(phi);
+      ctx.beginPath();ctx.ellipse(CX,CY-ry,rx,Math.abs(ry)*0.24,0,0,Math.PI*2);
+      ctx.strokeStyle=lat===0?'rgba(255,255,255,0.1)':'rgba(255,255,255,0.05)';
+      ctx.lineWidth=lat===0?0.7:0.4;ctx.stroke();
+    }
+    /* lng lines */
+    for(let lng=0;lng<360;lng+=30){
+      ctx.beginPath();let pen=false;
+      for(let lat=-85;lat<=85;lat+=4){
+        const p=project(lat,lng,R,W,H);
+        if(p.vis){pen?ctx.lineTo(p.sx,p.sy):ctx.moveTo(p.sx,p.sy);pen=true;}else pen=false;
+      }
+      ctx.strokeStyle='rgba(255,255,255,0.05)';ctx.lineWidth=0.3;ctx.stroke();
+    }
+
+    /* continents */
+    CONTINENTS.forEach(c=>drawContinent(c.pts,R,W,H,ctx));
+
+    /* arcs */
+    const tN=(ts/3000)%1;
+    ARCS.forEach(([ai,bi],idx)=>{
+      const na=NODES[ai],nb=NODES[bi],prog=(tN+idx*.11)%1,STEPS=60;
+      ctx.beginPath();let pd=false;
+      for(let i=0;i<=STEPS;i++){
+        const s=i/STEPS,lat=na.lat+(nb.lat-na.lat)*s,lng=na.lng+(nb.lng-na.lng)*s;
+        const lift=Math.sin(s*Math.PI)*30,p=project(lat,lng,R+lift,W,H);
+        if(p.vis){pd?ctx.lineTo(p.sx,p.sy):ctx.moveTo(p.sx,p.sy);pd=true;}else pd=false;
+      }
+      ctx.strokeStyle='rgba(191,197,205,0.22)';ctx.lineWidth=0.8;ctx.stroke();
+      /* pulse */
+      const s=prog,lat=na.lat+(nb.lat-na.lat)*s,lng=na.lng+(nb.lng-na.lng)*s;
+      const lift=Math.sin(s*Math.PI)*30,pp=project(lat,lng,R+lift,W,H);
+      if(pp.vis){
+        ctx.beginPath();ctx.arc(pp.sx,pp.sy,2.5,0,Math.PI*2);
+        ctx.fillStyle='rgba(220,225,230,0.9)';ctx.fill();
+      }
+    });
+
+    /* nodes */
+    NODES.forEach(n=>{
+      const p=project(n.lat,n.lng,R,W,H);if(!p.vis)return;
+      const isHov=hoveredNode===n;
+      const outerR=isHov?16:n.bright?10:7;
+      const innerR=isHov?5:n.bright?4:2.5;
+      /* outer ring */
+      ctx.beginPath();ctx.arc(p.sx,p.sy,outerR,0,Math.PI*2);
+      ctx.strokeStyle=isHov?'rgba(191,197,205,0.5)':n.bright?'rgba(191,197,205,0.3)':'rgba(191,197,205,0.12)';
+      ctx.lineWidth=isHov?1.2:0.8;ctx.stroke();
+      /* second ring on hover */
+      if(isHov){
+        ctx.beginPath();ctx.arc(p.sx,p.sy,10,0,Math.PI*2);
+        ctx.strokeStyle='rgba(191,197,205,0.2)';ctx.lineWidth=0.6;ctx.stroke();
+      }
+      /* dot */
+      ctx.beginPath();ctx.arc(p.sx,p.sy,innerR,0,Math.PI*2);
+      ctx.fillStyle=isHov?'#E8EDF2':n.bright?'#D0D4D9':'#8A9099';ctx.fill();
+      /* label */
+      ctx.font=(isHov?'500':'400')+' '+(isHov?11:9)+'px Inter,sans-serif';
+      ctx.fillStyle=isHov?'rgba(240,238,232,0.9)':n.bright?'rgba(191,197,205,0.7)':'rgba(191,197,205,0.4)';
+      ctx.fillText(n.lbl,p.sx+innerR+6,p.sy+3);
+    });
+
+    ctx.restore();
+
+    /* gloss */
+    const gl=ctx.createRadialGradient(CX-R*.3,CY-R*.32,0,CX-R*.15,CY-R*.18,R*.6);
+    gl.addColorStop(0,'rgba(255,255,255,0.06)');gl.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.beginPath();ctx.arc(CX,CY,R,0,Math.PI*2);ctx.fillStyle=gl;ctx.fill();
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+
+/* ════════════════════════════════
+   REGION SELECT
+════════════════════════════════ */
+function selRegion(el){
+  document.querySelectorAll('.region').forEach(r=>r.classList.remove('active'));
+  el.classList.add('active');
+}
+setTimeout(()=>{document.querySelectorAll('.region-bar-fill').forEach(el=>{el.style.width=(el.dataset.w||0)+'%'})},300);
+setTimeout(()=>{document.querySelectorAll('.attr-fill').forEach(el=>{el.style.width=(el.dataset.w||0)+'%'})},400);
+
+/* ════════════════════════════════
+   STALLION MARKET
+════════════════════════════════ */
+const SIRES=[
+  {name:'I Am Invincible',ticker:'IAI',region:'au',fee:'A$110,000',w30:38,wr:'68%',g1:24,fillyPct:'52%',signal:'out',trend:[52,58,55,62,60,65,68,72,70,75,78,82],rating:94,category:'filly'},
+  {name:'Merchant Navy',ticker:'MN',region:'au',fee:'A$88,000',w30:31,wr:'61%',g1:12,fillyPct:'48%',signal:'out',trend:[40,44,42,48,50,52,54,58,56,60,62,65],rating:88,category:'au'},
+  {name:'Fastnet Rock',ticker:'FR',region:'au',fee:'A$77,000',w30:44,wr:'58%',g1:31,fillyPct:'46%',signal:'hold',trend:[70,68,72,70,68,66,70,72,68,70,69,68],rating:82,category:'au'},
+  {name:'So You Think',ticker:'SYT',region:'au',fee:'A$44,000',w30:22,wr:'54%',g1:18,fillyPct:'51%',signal:'hold',trend:[38,40,38,42,40,44,42,46,44,48,46,50],rating:78,category:'au'},
+  {name:'Deep Field',ticker:'DF',region:'au',fee:'A$33,000',w30:18,wr:'51%',g1:8,fillyPct:'49%',signal:'watch',trend:[20,22,24,22,26,28,26,30,28,32,34,36],rating:72,category:'filly'},
+  {name:'Written Tycoon',ticker:'WT',region:'au',fee:'A$55,000',w30:14,wr:'44%',g1:15,fillyPct:'44%',signal:'under',trend:[50,48,46,44,42,40,38,36,34,32,30,28],rating:62,category:'au'},
+  {name:'Frankel',ticker:'FNK',region:'nh',fee:'£175,000',w30:29,wr:'72%',g1:38,fillyPct:'53%',signal:'out',trend:[60,65,68,70,72,74,76,78,80,82,84,86],rating:96,category:'filly'},
+  {name:'Galileo (deceased)',ticker:'GAL',region:'nh',fee:'Legacy',w30:41,wr:'74%',g1:82,fillyPct:'55%',signal:'hold',trend:[88,86,84,82,80,78,76,74,72,70,68,66],rating:91,category:'nh'},
+  {name:'No Nay Never',ticker:'NNN',region:'nh',fee:'€80,000',w30:20,wr:'58%',g1:14,fillyPct:'50%',signal:'watch',trend:[44,46,44,48,46,50,48,52,50,48,46,44],rating:74,category:'filly'},
+  {name:'Gun Runner',ticker:'GR',region:'sh',fee:'$125,000',w30:24,wr:'55%',g1:16,fillyPct:'47%',signal:'watch',trend:[30,32,34,36,38,40,42,44,46,48,50,52],rating:76,category:'sh'},
+];
+
+const SIG={
+  out:{cls:'sig-out',lbl:'Outperform'},
+  hold:{cls:'sig-hold',lbl:'Hold'},
+  under:{cls:'sig-under',lbl:'Underweight'},
+  watch:{cls:'sig-watch',lbl:'Watch'}
+};
+
+function buildSpark(data,signal){
+  const max=Math.max(...data),min=Math.min(...data);
+  const col=signal==='out'?'var(--pos)':signal==='under'?'var(--neg)':'rgba(191,197,205,0.4)';
+  return data.map(v=>{
+    const h=Math.max(2,Math.round(((v-min)/(max-min||1))*22)+2);
+    return`<div class="spark-bar" style="height:${h}px;background:${col}"></div>`;
+  }).join('');
+}
+
+function renderSires(filter){
+  const table=document.getElementById('stallion-table');
+  const filtered=filter==='all'?SIRES:SIRES.filter(s=>s.region===filter||s.category===filter);
+  table.innerHTML=filtered.map(s=>`
+    <div class="srow${s.signal==='out'?' featured':''}">
+      <div class="scell"><span class="scell-name">${s.name}</span><span class="scell-ticker">${s.ticker}</span></div>
+      <div class="scell">${s.fee}</div>
+      <div class="scell" style="color:var(--t0)">${s.w30}</div>
+      <div class="scell" style="color:var(--t0)">${s.wr}</div>
+      <div class="scell">${s.g1}</div>
+      <div class="scell">${s.fillyPct}</div>
+      <div class="scell"><span class="signal ${SIG[s.signal].cls}">${SIG[s.signal].lbl}</span></div>
+      <div class="sparkline-cell"><div class="spark">${buildSpark(s.trend,s.signal)}</div></div>
+      <div class="scell" style="color:var(--t0);font-size:14px">${s.rating}</div>
+    </div>
+  `).join('');
+}
+renderSires('all');
+
+function filterSires(f,btn){
+  document.querySelectorAll('.sf-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderSires(f);
+}
+
+/* ════════════════════════════════
+   CHART
+════════════════════════════════ */
+(function(){
+  const data=[54,58,56,62,66,61,68,72,76,74,80,88];
+  const vals=[3380,3420,3395,3500,3560,3480,3620,3710,3800,3770,3900,4182];
+  const c=document.getElementById('chart-bars');if(!c)return;
+  data.forEach((v,i)=>{
+    const w=document.createElement('div');
+    w.className='tc-bar-wrap'+(i===data.length-1?' hi':'');
+    w.style.cssText='flex:1;height:100%;display:flex;align-items:flex-end';
+    const b=document.createElement('div');
+    b.className='tc-bar-inner';
+    b.style.cssText='width:100%;height:0;transition:height .9s '+(i*.05).toFixed(2)+'s cubic-bezier(.16,1,.3,1),background .2s';
+    w.appendChild(b);
+    w.addEventListener('mouseenter',()=>{document.getElementById('chart-val').textContent='A$'+vals[i].toLocaleString()});
+    w.addEventListener('mouseleave',()=>{document.getElementById('chart-val').textContent='A$4,182'});
+    c.appendChild(w);
+    setTimeout(()=>{b.style.height=v+'%'},500+i*40);
+  });
+})();
+
+/* ════════════════════════════════
+   TRACK RECORD
+════════════════════════════════ */
+(function(){
+  const TX=[
+    {id:'EBX-AU-2021-004',name:'Confidential — Filly',sire:'I Am Invincible × Confidential Dam',acquired:'A$420,000',sold:'A$1,400,000',return:'+233%',period:'14 months',thesis:'Acquired at Inglis February 2022 — unfashionable dam line obscured the commercial value of the sire cross. Identified via EBX pedigree screening. Placed privately to Japanese operation 14 months later at significant premium. Japanese buyer motivated by I Am Invincible filly scarcity in their market.'},
+    {id:'EBX-NZ-2022-007',name:'Confidential — Filly',sire:'Merchant Navy × NZ Black Type Family',acquired:'NZ$280,000',sold:'NZ$740,000',return:'+164%',period:'9 months',thesis:'NZB Karaka acquisition — bought below reserve on a book 2 filly with exceptional physical. Merchant Navy commercial demand in Australia was rising. Placed to Queensland syndicate within 9 months following a trial performance that confirmed EBX physical assessment.'},
+    {id:'EBX-EU-2023-002',name:'Confidential — Filly',sire:'Frankel × Stakes-Placed Mare',acquired:'£185,000',sold:'£480,000',return:'+159%',period:'18 months',thesis:'Tattersalls Book 2 purchase overlooked due to minor conformation note in the vetting. EBX assessment judged the note non-commercial. Frankel filly with group-placed dam — placed to Australian operation seeking Northern Hemisphere bloodlines at a significant AUD premium following currency movement.'},
+    {id:'EBX-AU-2023-011',name:'Confidential — Filly',sire:'So You Think × Listed-Winning Mare',acquired:'A$160,000',sold:'A$390,000',return:'+144%',period:'11 months',thesis:'Magic Millions February acquisition — So You Think filly with a dam producing consistent black type. Acquired below book value in a thin market. Placed to a Victorian operation seeking a broodmare prospect with emerging sire momentum.'},
+  ];
+  const grid=document.getElementById('tx-grid');if(!grid)return;
+  grid.innerHTML=TX.map((t,i)=>`
+    <div class="tx-row" onclick="toggleTx(this)">
+      <div class="tx-cell"><div class="tx-lbl">Asset ID</div><div class="tx-val" style="font-family:var(--mono);font-size:11px">${t.id}</div><div class="tx-sub">${t.sire}</div></div>
+      <div class="tx-cell"><div class="tx-lbl">Acquired</div><div class="tx-val">${t.acquired}</div><div class="tx-sub">Entry price</div></div>
+      <div class="tx-cell"><div class="tx-lbl">Placed At</div><div class="tx-val">${t.sold}</div><div class="tx-sub">Exit price</div></div>
+      <div class="tx-cell"><div class="tx-lbl">Hold Period</div><div class="tx-val">${t.period}</div><div class="tx-sub">Entry to placement</div></div>
+      <div class="tx-cell" style="border-right:none"><div class="tx-return up">${t.return}</div><div class="tx-sub">Total return</div></div>
+      <div class="tx-expand tx-thesis">${t.thesis}</div>
+    </div>
+  `).join('');
+})();
+
+function toggleTx(el){el.classList.toggle('open')}
+
+/* ════════════════════════════════
+   SALE CALENDAR
+════════════════════════════════ */
+(function(){
+  const CAL=[
+    {month:'January',events:[
+      {name:'Magic Millions Gold Coast',loc:'Gold Coast · AU',date:'11–13 Jan',tag:'Primary',cls:'tag-primary'},
+      {name:'Karaka Select',loc:'Auckland · NZ',date:'27–28 Jan',tag:'Active',cls:'tag-active'},
+    ]},
+    {month:'February',events:[
+      {name:'Inglis Premier',loc:'Sydney · AU',date:'16–18 Feb',tag:'Primary',cls:'tag-primary'},
+      {name:'Tattersalls Guineas',loc:'Newmarket · UK',date:'22–23 Feb',tag:'Monitor',cls:'tag-monitor'},
+    ]},
+    {month:'March',events:[
+      {name:'Inglis Classic',loc:'Sydney · AU',date:'8–9 Mar',tag:'Active',cls:'tag-active'},
+      {name:'Arqana Breeze-Up',loc:'Deauville · FR',date:'28 Mar',tag:'Monitor',cls:'tag-monitor'},
+    ]},
+    {month:'July',events:[
+      {name:'Tattersalls Book 1',loc:'Newmarket · UK',date:'8–11 Jul',tag:'Primary',cls:'tag-primary'},
+      {name:'Goffs Orby',loc:'Kildare · IRE',date:'29–31 Jul',tag:'Active',cls:'tag-active'},
+    ]},
+    {month:'August',events:[
+      {name:'Inglis Yearling',loc:'Sydney · AU',date:'17–19 Aug',tag:'Active',cls:'tag-active'},
+      {name:'Arqana August',loc:'Deauville · FR',date:'19–20 Aug',tag:'Active',cls:'tag-active'},
+    ]},
+    {month:'November',events:[
+      {name:'Keeneland November',loc:'Lexington · US',date:'3–19 Nov',tag:'Active',cls:'tag-active'},
+      {name:'Tattersalls Dec Mares',loc:'Newmarket · UK',date:'27–28 Nov',tag:'Primary',cls:'tag-primary'},
+    ]},
+  ];
+  const grid=document.getElementById('cal-grid');if(!grid)return;
+  grid.innerHTML=CAL.map(m=>`
+    <div class="cal-month">
+      <div class="cal-month-hd">
+        <span class="cal-month-name">${m.month}</span>
+        <span class="cal-month-count">${m.events.length} sale${m.events.length>1?'s':''}</span>
+      </div>
+      <div class="cal-events">
+        ${m.events.map(e=>`
+          <div class="cal-event">
+            <div class="cal-ev-l">
+              <div class="cal-ev-name">${e.name}</div>
+              <div class="cal-ev-loc">${e.loc}</div>
+            </div>
+            <div class="cal-ev-r">
+              <div class="cal-ev-date">${e.date}</div>
+              <div class="cal-ev-tag ${e.cls}">${e.tag}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+})();
+</script>
+</body>
+</html>
